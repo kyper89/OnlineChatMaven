@@ -1,4 +1,4 @@
-package chat;
+package server.chat;
 
 import java.util.Objects;
 

@@ -1,6 +1,6 @@
-package handler;
+package server.handler;
 
-import chat.MyServer;
+import server.chat.MyServer;
 import clientserver.Command;
 import clientserver.CommandType;
 import clientserver.commands.AuthCommandData;

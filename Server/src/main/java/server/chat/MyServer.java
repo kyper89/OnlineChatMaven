@@ -1,9 +1,9 @@
-package chat;
+package server.chat;
 
-import auth.AuthService;
-import auth.BaseAuthService;
+import server.auth.AuthService;
+import server.auth.BaseAuthService;
 import clientserver.Command;
-import handler.ClientHandler;
+import server.handler.ClientHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -58,7 +58,7 @@ public class MyServer {
     private void waitAndProcessNewClientConnection(ServerSocket serverSocket) throws IOException {
         System.out.println("Ожидание нового подключения....");
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Клиент подключился");// /auth login password
+        System.out.println("Клиент подключился");// /server.auth login password
         processClientConnection(clientSocket);
     }
 

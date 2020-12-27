@@ -1,6 +1,6 @@
-package auth;
+package server.auth;
 
-import chat.User;
+import server.chat.User;
 
 import java.util.Map;
 

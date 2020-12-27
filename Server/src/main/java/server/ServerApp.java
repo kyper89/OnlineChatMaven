@@ -1,4 +1,6 @@
-import chat.MyServer;
+package server;
+
+import server.chat.MyServer;
 
 import java.io.IOException;
 
@@ -14,7 +16,7 @@ public class ServerApp {
         try {
             new MyServer().start(port);
         } catch (IOException e) {
-            System.err.println("Failed to create chat.MyServer");
+            System.err.println("Failed to create server.chat.MyServer");
             e.printStackTrace();
         }
     }

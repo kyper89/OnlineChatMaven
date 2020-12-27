@@ -39,7 +39,7 @@ public class Client extends Application {
         Parent root = loader.load();
         viewController = loader.getController();
 
-        primaryStage.setTitle("Online chat");
+        primaryStage.setTitle("Online server.chat");
         primaryStage.setScene(new Scene(root, 800, 600));
         viewController.getTextField().requestFocus();
 
