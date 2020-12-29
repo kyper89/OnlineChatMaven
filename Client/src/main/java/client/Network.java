@@ -108,6 +108,11 @@ public class Network {
                 UpdateUsersListCommandData data = (UpdateUsersListCommandData) command.getData();
                 Platform.runLater(() -> clientChat.updateUsers(data.getUsers()));
             }
+            case CHANGE_NICK_OK -> {
+                ChangeNickOkCommandData data = (ChangeNickOkCommandData) command.getData();
+                this.nickname = data.getNickName();
+                Platform.runLater(() -> clientChat.changeTitle(data.getNickName()));
+            }
             default -> throw new IllegalArgumentException("Unknown command type: " + command.getType());
         }
     }
@@ -145,6 +150,10 @@ public class Network {
 
     public void sendEndMessage() throws IOException {
         sendCommand(endCommand());
+    }
+
+    public void changeNick(String newNickname) throws IOException {
+        sendCommand(changeNickCommand(newNickname));
     }
 
     public void close() {

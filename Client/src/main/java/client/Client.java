@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Client extends Application {
 
-    public static final List<String> USERS_TEST_DATA = List.of("Oleg", "Alexey", "Peter");
+   // public static final List<String> USERS_TEST_DATA = List.of("Oleg", "Alexey", "Peter");
 
     private ClientChatState state = ClientChatState.AUTHENTICATION;
     private Stage primaryStage;
@@ -98,6 +98,7 @@ public class Client extends Application {
         authDialogStage.close();
         primaryStage.show();
         viewController.getTextField().requestFocus();
+        viewController.nickField.setText(nickname);
     }
 
     public static void main(String[] args) {
@@ -108,4 +109,7 @@ public class Client extends Application {
         return state;
     }
 
+    public void changeTitle(String newNickname) {
+        primaryStage.setTitle(newNickname);
+    }
 }

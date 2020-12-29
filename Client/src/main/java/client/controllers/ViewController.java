@@ -2,7 +2,6 @@ package client.controllers;
 
 import client.Client;
 import client.Network;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -16,9 +15,13 @@ public class ViewController {
 
     @FXML
     public Button buttonEnter;
+    @FXML
+    public Button changeNickButton;
 
     @FXML
     private TextField textField;
+    @FXML
+    public TextField nickField;
 
     @FXML
     private TextArea messagesArea;
@@ -28,7 +31,7 @@ public class ViewController {
 
     @FXML
     public void initialize() {
-        usersList.setItems(FXCollections.observableArrayList(Client.USERS_TEST_DATA));
+//        usersList.setItems(FXCollections.observableArrayList(Client.USERS_TEST_DATA));
 
         usersList.setCellFactory(lv -> {
             MultipleSelectionModel<String> selectionModel = usersList.getSelectionModel();
@@ -76,6 +79,22 @@ public class ViewController {
             e.printStackTrace();
             String errorMessage = "Failed to send message";
             Client.showNetworkError(e.getMessage(), errorMessage);
+        }
+    }
+
+    @FXML
+    public void changeNick() {
+        String nick = nickField.getText();
+        if (nick == null || nick.isBlank()) {
+            Client.showNetworkError("Ник не может быть пустым!", "Валидация");
+            return;
+        }
+
+        try {
+            network.changeNick(nick);
+        } catch (IOException e) {
+            Client.showNetworkError(e.getMessage(), "Change nick error!");
+            e.printStackTrace();
         }
     }
 

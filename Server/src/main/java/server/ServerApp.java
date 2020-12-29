@@ -15,7 +15,7 @@ public class ServerApp {
         }
         try {
             new MyServer().start(port);
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Failed to create server.chat.MyServer");
             e.printStackTrace();
         }

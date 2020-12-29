@@ -1,5 +1,6 @@
 package server.handler;
 
+import clientserver.commands.ChangeNickCommandData;
 import server.chat.MyServer;
 import clientserver.Command;
 import clientserver.CommandType;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,6 +43,9 @@ public class ClientHandler {
                 readMessages();
             } catch (IOException e) {
                 System.out.println("Клиент отключился до аутентификации");
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Непредвиденная ошибка чтения сообщений");
             } finally {
                 try {
                     closeConnection();
@@ -121,7 +126,7 @@ public class ClientHandler {
         return command;
     }
 
-    private void readMessages() throws IOException {
+    private void readMessages() throws Exception {
         while (true) {
             Command command = readCommand();
             if (command == null) {
@@ -140,6 +145,18 @@ public class ClientHandler {
                     PublicMessageCommandData data = (PublicMessageCommandData) command.getData();
                     String message = data.getMessage();
                     myServer.broadcastMessage(message, this);
+                    break;
+                }
+                case CHANGE_NICK: {
+                    ChangeNickCommandData data = (ChangeNickCommandData) command.getData();
+                    String newNickname = data.getNewNickname();
+                    if (myServer.isNickBusy(newNickname) || myServer.isNickBusyInDataBase(newNickname)) {
+                        sendCommand(errorCommand("Этот ник уже занят!"));
+                        break;
+                    }
+                    if (myServer.changeNick(newNickname, this)) {
+                        sendCommand(changeNickOkCommand(newNickname));
+                    }
                     break;
                 }
                 case END:
@@ -168,7 +185,7 @@ public class ClientHandler {
         return nickname;
     }
 
-    private void setNickname(String nickname) {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 }

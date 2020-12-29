@@ -28,4 +28,14 @@ public class BaseAuthService implements AuthService {
         User requestedUser = new User(login, password, null);
         return USERS.get(requestedUser);
     }
+
+    @Override
+    public boolean changeNick(String currentNick, String newNick) {
+        return true;
+    }
+
+    @Override
+    public boolean isNickBusy(String newNick) {
+        return false;
+    }
 }

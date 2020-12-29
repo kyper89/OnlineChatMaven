@@ -12,4 +12,6 @@ public enum CommandType {
 
     END,
     UPDATE_USERS_LIST,
+    CHANGE_NICK,
+    CHANGE_NICK_OK,
 }
