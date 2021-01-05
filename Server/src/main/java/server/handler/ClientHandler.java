@@ -81,7 +81,7 @@ public class ClientHandler {
                     continue;
                 }
 
-                sendCommand(authOkCommand(nickname));
+                sendCommand(authOkCommand(nickname, login));
                 setNickname(nickname);
                 myServer.broadcastMessage(String.format("Пользователь '%s' зашел в чат!", nickname), null);
                 myServer.subscribe(this);

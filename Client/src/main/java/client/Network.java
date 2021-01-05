@@ -24,6 +24,7 @@ public class Network {
     private Socket socket;
     private Client clientChat;
     private String nickname;
+    private Logger logger;
 
     public Network() {
         this(SERVER_ADDRESS, SERVER_PORT);
@@ -58,6 +59,7 @@ public class Network {
 
     public void sendMessage(String message) throws IOException {
         sendCommand(publicMessageCommand(nickname, message));
+        this.logger.addMessageInHistory("Я: " + message);
     }
 
     private void sendCommand(Command command) throws IOException {
@@ -73,8 +75,9 @@ public class Network {
                         continue;
                     }
 
-                    if (clientChat.getState() == ClientChatState.AUTHENTICATION) {
+                    if (this.nickname == null) {
                         processAuthResult(command);
+                        this.logger.showHistory(viewController);
                     } else {
                         processMessage(viewController, command);
                     }
@@ -92,13 +95,16 @@ public class Network {
         switch (command.getType()) {
             case INFO_MESSAGE -> {
                 MessageInfoCommandData data = (MessageInfoCommandData) command.getData();
+                Platform.runLater(() -> this.logger.addMessageInHistory(data.getMessage()));
                 Platform.runLater(() -> viewController.appendMessage(data.getMessage()));
             }
             case CLIENT_MESSAGE -> {
                 ClientMessageCommandData data = (ClientMessageCommandData) command.getData();
                 String sender = data.getSender();
                 String message = data.getMessage();
-                Platform.runLater(() -> viewController.appendMessage(String.format("%s: %s", sender, message)));
+                String text = String.format("%s: %s", sender, message);
+                Platform.runLater(() -> this.logger.addMessageInHistory(text));
+                Platform.runLater(() -> viewController.appendMessage(text));
             }
             case ERROR -> {
                 ErrorCommandData data = (ErrorCommandData) command.getData();
@@ -121,8 +127,9 @@ public class Network {
         switch (command.getType()) {
             case AUTH_OK -> {
                 AuthOkCommandData data = (AuthOkCommandData) command.getData();
-                nickname = data.getUsername();
-                Platform.runLater(() -> clientChat.activeChatDialog(nickname));
+                this.nickname = data.getUsername();
+                this.logger = new Logger(data.getLogin());
+                Platform.runLater(() -> clientChat.activeChatDialog(this.nickname));
             }
             case ERROR -> {
                 ErrorCommandData data = (ErrorCommandData) command.getData();
