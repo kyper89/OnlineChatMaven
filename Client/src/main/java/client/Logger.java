@@ -4,6 +4,7 @@ import client.controllers.ViewController;
 
 import java.io.*;
 
+
 public class Logger {
 
     public static final int NUMBER_OF_HISTORY_LINE_OF_LOAD = 100;
@@ -25,12 +26,13 @@ public class Logger {
 
     public void showHistory(ViewController viewController) {
         try (BufferedReader reader = new BufferedReader(new FileReader(this.fileName))) {
-            String str;
-            int count = 1;
-            while ((str = reader.readLine()) != null && count <= NUMBER_OF_HISTORY_LINE_OF_LOAD) {
-                viewController.appendMessage(str);
-                count++;
+
+            Object[] arrLines = reader.lines().toArray();
+            int count = arrLines.length > NUMBER_OF_HISTORY_LINE_OF_LOAD ? arrLines.length - NUMBER_OF_HISTORY_LINE_OF_LOAD : 0;
+            for (int i = count; i < arrLines.length; i++) {
+                viewController.appendMessage(String.valueOf(arrLines[i]));
             }
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Не удалось загрузить сообщения из истории");
