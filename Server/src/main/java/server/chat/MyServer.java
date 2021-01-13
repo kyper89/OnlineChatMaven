@@ -12,11 +12,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private final AuthService authService;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public MyServer() {
         this.authService = new SQLiteAuthService();
@@ -59,13 +62,17 @@ public class MyServer {
     private void waitAndProcessNewClientConnection(ServerSocket serverSocket) throws IOException {
         System.out.println("Ожидание нового подключения....");
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Клиент подключился");// /server.auth login password
-        processClientConnection(clientSocket);
-    }
+        System.out.println("Клиент подключился");
 
-    private void processClientConnection(Socket clientSocket) throws IOException {
-        ClientHandler clientHandler = new ClientHandler(this, clientSocket);
-        clientHandler.handle();
+        executorService.execute(() -> {
+            try {
+                ClientHandler clientHandler = new ClientHandler(this, clientSocket);
+                clientHandler.handle();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Ошибка установки связи с клиентом");
+            }
+        });
     }
 
     public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
