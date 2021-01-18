@@ -36,23 +36,24 @@ public class ClientHandler {
         in  = new ObjectInputStream(clientSocket.getInputStream());
         out = new ObjectOutputStream(clientSocket.getOutputStream());
 
-        new Thread(() -> {
+        try {
+            authentication();
+        } catch (IOException e) {
+            System.out.println("Клиент отключился до аутентификации");
+        }
+
+        try {
+            readMessages();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Непредвиденная ошибка чтения сообщений");
+        } finally {
             try {
-                authentication();
-                readMessages();
+                closeConnection();
             } catch (IOException e) {
-                System.out.println("Клиент отключился до аутентификации");
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Непредвиденная ошибка чтения сообщений");
-            } finally {
-                try {
-                    closeConnection();
-                } catch (IOException e) {
-                    System.err.println("Failed to close connection!");
-                }
+                System.err.println("Failed to close connection!");
             }
-        }).start();
+        }
     }
 
     private void authentication() throws IOException {
