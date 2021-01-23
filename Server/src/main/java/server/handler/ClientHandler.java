@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 import static clientserver.Command.*;
 
@@ -86,6 +87,7 @@ public class ClientHandler {
                 setNickname(nickname);
                 myServer.broadcastMessage(String.format("Пользователь '%s' зашел в чат!", nickname), null);
                 myServer.subscribe(this);
+                myServer.getLogger().log(Level.INFO, nickname + " connect");
                 return;
             }
         }
@@ -133,6 +135,7 @@ public class ClientHandler {
                 continue;
             }
 
+            myServer.getLogger().log(Level.FINER, nickname + " send message", command);
             switch (command.getType()) {
                 case PRIVATE_MESSAGE: {
                     PrivateMessageCommandData data = (PrivateMessageCommandData) command.getData();

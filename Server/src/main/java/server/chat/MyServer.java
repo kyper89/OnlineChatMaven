@@ -14,20 +14,38 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.*;
 
 public class MyServer {
 
     private final List<ClientHandler> clients = new ArrayList<>();
     private final AuthService authService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private Logger logger;
 
-    public MyServer() {
+    public MyServer() throws IOException {
+        prepareLogger();
         this.authService = new SQLiteAuthService();
+    }
+
+    private void prepareLogger() throws IOException {
+        this.logger = Logger.getLogger(MyServer.class.getName());
+        this.logger.setLevel(Level.FINER);
+
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.FINER);
+
+        FileHandler fileHandler = new FileHandler("log.log", true);
+        fileHandler.setLevel(Level.INFO);
+
+        this.logger.addHandler(consoleHandler);
+        this.logger.addHandler(fileHandler);
+        this.logger.setUseParentHandlers(false);
     }
 
     public void start(int port) throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Сервер был запущен");
+            logger.log(Level.INFO, "Start server");
             runServerMessageThread();
             authService.start();
             //noinspection InfiniteLoopStatement
@@ -35,8 +53,7 @@ public class MyServer {
                 waitAndProcessNewClientConnection(serverSocket);
             }
         } catch (IOException | SQLException e) {
-            System.err.println("Failed to accept new connection");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to accept new connection", e);
         } finally {
             authService.stop();
         }
@@ -50,8 +67,7 @@ public class MyServer {
                 try {
                     broadcastMessage("Сервер: " + serverMessage, null);
                 } catch (IOException e) {
-                    System.err.println("failed to process serverMessage");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Failed to process serverMessage", e);
                 }
             }
         });
@@ -158,6 +174,10 @@ public class MyServer {
         }
 
         return success;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
 }
